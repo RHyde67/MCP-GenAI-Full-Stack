@@ -1,0 +1,22 @@
+# Python caches
+__pycache__/
+*.pyc
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# VSCode folder
+.vscode/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Ignore contents of uploads and vdb, but keep folders
+uploads/*
+vdb/*
+!uploads/.gitkeep
+!vdb/.gitkeep
