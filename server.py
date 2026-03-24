@@ -389,4 +389,8 @@ async def reset_chat_memory():
 # Run server
 # --------------------------
 if __name__ == "__main__":
+    # use this line to run normally with FastMCP's built-in server:
     mcp.run(transport="streamable-http", host="127.0.0.1", port=8000)
+    # Use this line to test the standalone server using inspector.
+    # python -m mcp_inspector --command python -- server.py
+    # mcp.run()
