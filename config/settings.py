@@ -11,12 +11,24 @@ class Settings:
     def __init__(self):
         # LOCAL DEVELOPMENT SETTINGS
         #
-        # Ollama LLM runs on localhost:11434
-        self.LLM_BASE_URL = os.getenv("LLM_BASE_URL", "http://localhost:11434")
+        # Ollama LLM runs on localhost:http://localhost:11434
+        # DiSH IP for LLM: http://10.3.2.212:11434")
+        # Switch manually here (no env vars needed)
+        
+        # Default mode
+        self.LLM_MODE = "local"   # default fallback
+        self.update_llm_mode(self.LLM_MODE)
 
-        # Local test VDB (Chroma or mock)
-        self.VDB_BASE_URL = os.getenv("VDB_BASE_URL", "http://localhost:8001")
+        self.VDB_BASE_URL = "http://localhost:8001"
 
-@lru_cache()
-def get_settings() -> Settings:
-    return Settings()
+
+
+    def update_llm_mode(self, mode: str):
+        self.LLM_MODE = mode.lower()
+
+        if self.LLM_MODE == "local":
+            self.LLM_BASE_URL = "http://localhost:11434"
+        else:
+            self.LLM_BASE_URL = "http://10.3.2.212:11434"
+
+settings = Settings()   # global shared settings object for use in app
