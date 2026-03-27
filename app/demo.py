@@ -1,8 +1,14 @@
+import sys, os
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if ROOT not in sys.path:
+    sys.path.append(ROOT)
+
 import streamlit as st
 from mcp_client import call
 import asyncio
 import os
 import requests
+from config.settings import settings
 
 def safe_call(coro):
     try:
@@ -45,6 +51,25 @@ mode = st.sidebar.radio(
 )
 
 st.sidebar.divider()
+# ------------------------------------------
+# LLM MODE TOGGLE (Local / Remote)
+# ------------------------------------------
+st.sidebar.subheader("LLM Selection")
+
+llm_choice = st.sidebar.radio(
+    "Choose LLM:",
+    ("Local (Ollama)", "Remote Server"),
+    index=0 if settings.LLM_MODE == "local" else 1
+)
+
+# Update mode when user switches
+if llm_choice.startswith("Local"):
+    settings.update_llm_mode("local")
+else:
+    settings.update_llm_mode("remote")
+
+st.sidebar.write(f"✅ Active LLM: **{settings.LLM_MODE.upper()}**")
+st.sidebar.write(f"📡 Endpoint: `{settings.LLM_BASE_URL}`")
 
 st.sidebar.header("Document Controls")
 
