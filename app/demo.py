@@ -128,6 +128,7 @@ if st.sidebar.button(" Add Document", key="open_add_doc"):
     st.session_state["show_add_modal"] = True
     st.session_state.pop("confirm_overwrite", None)  # reset overwrite state
 
+
 if st.session_state.get("show_add_modal", False):
     st.write("##  Add Document")
 
@@ -167,6 +168,7 @@ if st.session_state.get("show_add_modal", False):
         # Either file does not exist OR user confirmed overwrite
         if st.button("Add Document", key="confirm_add_doc"):
 
+            # ✅ Save file to uploads/
             import os
             save_dir = os.path.abspath("uploads")
             os.makedirs(save_dir, exist_ok=True)
@@ -176,8 +178,18 @@ if st.session_state.get("show_add_modal", False):
             with open(dest_path, "wb") as f:
                 f.write(uploaded.read())
 
+            # ✅ CALL THE VDB TOOL
+            resp = safe_call(call("vdb_add_document", {"path": dest_path}))
 
+            # ✅ Feedback to user
+            st.success(f"✅ Document '{filename}' added successfully.")
 
+            # ✅ Close the modal
+            st.session_state["show_add_modal"] = False
+            st.session_state.pop("confirm_overwrite", None)
+
+            # ✅ Stop further rendering
+            st.stop()
 
 # ---------------------------------------------------------
 # MODAL: UPDATE DOCUMENT
@@ -186,7 +198,7 @@ if st.session_state.get("show_update_modal"):
 
     st.write("## 📝 Update Document")
 
-    # ✅ Correct list_documents call
+    # Load documents
     docs_result = safe_call(call("vdb_list_documents"))
     docs = docs_result.data["documents"]
 
@@ -202,29 +214,27 @@ if st.session_state.get("show_update_modal"):
 
         import os
 
-        # ✅ Save replacement file
+        # ✅ 1. Delete old document from DB
+        safe_call(call("vdb_delete_document", {"filename": filename}))
+
+        # ✅ 2. Save the new document using ITS OWN filename
+        new_filename = uploaded.name
         save_dir = os.path.abspath("uploads")
         os.makedirs(save_dir, exist_ok=True)
-        dest_path = os.path.join(save_dir, filename)
+        dest_path = os.path.join(save_dir, new_filename)
 
         uploaded.seek(0)
         with open(dest_path, "wb") as f:
             f.write(uploaded.read())
 
-        # ✅ Call MCP tool to update VDB
-        resp = safe_call(call("vdb_update_document", {"path": dest_path}))
-        
-        # ✅ Extract useful fields (if any)
-        old_chunks = resp.data.get("old_chunks_removed", 0)
-        new_chunks = resp.data.get("new_chunks_added", 0)
+        # ✅ 3. Insert the new file
+        resp = safe_call(call("vdb_add_document", {"path": dest_path}))
 
         st.success(
-            f"✅ Document '{filename}' updated successfully "
-            f"({old_chunks} old chunks replaced with {new_chunks} new chunks)."
+            f"✅ Document '{filename}' replaced with '{new_filename}'."
         )
 
-
-        # ✅ Close modal AFTER success
+        # ✅ Close modal
         st.session_state["show_update_modal"] = False
 
 
