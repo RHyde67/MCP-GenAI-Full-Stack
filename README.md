@@ -81,7 +81,7 @@ The app will open in your browser and use the server to run the tools.
 
 ## Support
 Initial dev by Richard Hyde:
-richard.hyde@global.amentum.com
+richard.hyde@rwhyde.co.uk
 
 ## Roadmap
 No further plans at this time. This adequately demonstartes the benfits of MCP.
